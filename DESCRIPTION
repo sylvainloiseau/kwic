@@ -1,0 +1,18 @@
+Package: kwic
+Type: Package
+Title: Print Textual Corpora as Key Word in Context (aka concordance)
+Version: 0.0.0.9000
+Authors@R: person("Sylvain", "Loiseau", email = "sylvain.loiseau@univ-paris13.fr", role = c("aut", "cre"))
+Description: Print Kwic for various textual format, including Text Interchange Formats corpora (https://github.com/ropensci/tif).
+Depends: R (>= 3.4.3), tm, methods, NLP, stringi
+License: BSD_3_clause + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Lazyload: yes
+URL: https://github.com/sylvainloiseau/kwic
+RoxygenNote: 6.0.1
+Remotes: git::https://github.com/ropensci/tif
+Collate: pkg.R kwic.R KwicLine.R KwicWord.R
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

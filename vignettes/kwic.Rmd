@@ -1,0 +1,119 @@
+---
+title: "Kwic: key word in context"
+author: "Sylvain Loiseau (sylvain.loiseau@univ-paris13.fr)"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Overview
+
+kwic is a R package for producing key word in context (concordance) from linguistic corpora:
+
+```{r}
+library(kwic)
+data(dickensl)
+kwic(dickensl, "the")
+```
+
+The method work for several representations of corpora :
+
+- character vector of untokenized strings, 
+- list of character vectors of tokens,
+- data frame with where each row describe a token and columns give the wordform, POS, lemma, etc.,
+- VCorpus from the tm package
+
+The first three corpus types are defined in the Text Interchange Formats : https://github.com/ropensci/tif
+
+Several options are available for a fine handling of the output.
+
+```{r}
+data(dickensl)
+k <- kwic(dickensl, "the")
+print(k, sort.by="right")
+```
+
+# Building kwic
+
+The argument pattern may be interpreted as a regexp or as a fixed string, depending on the value of the argument "fixed":
+
+```{r}
+data(dickensl)
+k <- kwic(dickensl, "(is|are|was)", fixed=FALSE)
+print(k, sort.by="right")
+```
+
+In order to have the regexp matching whole tokens, and not any substring in tokens, anchors may be added:
+
+```{r}
+data(dickensl)
+k <- kwic(dickensl, "\\b(is|are|was)\\b", fixed=FALSE)
+print(k, sort.by="right")
+```
+
+
+
+# Printing kwic
+
+Select how many lines to be printed:
+
+```{r}
+k <- kwic(dickensl, "the")
+print(k, sort.by="right", from=3, to=4)
+```
+
+# Tokens-sensitive kwic
+
+Windows size may be defined as a given number or ''characters'' or a given number of ''tokens'', according to the value of the parameter "unit". Such 'tokens-sensitive kwic' is possible only on tokenized corpora (excluding vector of untoknized strings).
+
+With 'tokens-sensitive kwic', no token are truncated at the beginning or the end of the line. It may be usefull is the kwic lines are to be used as a subcorpus for further analyses.
+
+In the following example five tokens are displayed on both sides:
+
+```{r}
+data(dickensl)
+k <- kwic(dickensl, "the", 5, 5, unit="token")
+print(k)
+```
+
+With this type of kwic, sorting lines by the left context produce a different effect: the line are sorted by the ''beginning'' of the last word on the left, and not by the last character on the left:
+
+```{r}
+print(k, sort.by="left")
+```
+
+Moreover, sorting may operate on any token at the n-th position at the left or the right of the node. With "sort.by=-2", the ordering is done using the second token on the left. With "sort.by=2", the ordering is done using the second token on the right.
+
+```{r}
+print(k, sort.by=-2)
+print(k, sort.by=2)
+```
+
+# Case study
+
+## Reading in a directory with tm
+
+Kwic does not address the issue of reading files or walking through directories. The tm package handles this nicely:
+
+```{r}
+mydir <- system.file("text", package="kwic")
+corpus <- VCorpus(
+  DirSource(directory=mydir, encoding="UTF-8"),
+  readerControl = list(reader=readPlain)
+)
+kwic(corpus, "the")
+```
+
+
