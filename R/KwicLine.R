@@ -96,6 +96,8 @@ setMethod("print", signature(x="KwicLine"), function(x, from=1, to=-1, sort.by="
     o <- 1:x@nbr.match;
   } else if (sort.by == "left") {
     o <- order(stringi::stri_reverse(x@left.context.slot), decreasing=decreasing)
+  } else {
+    o <- 1:length(x@right.context.slot);
   }
 
   ## Selection of the lines to be printed
