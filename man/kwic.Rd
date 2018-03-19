@@ -43,14 +43,17 @@ kwic(corpus, pattern, left = ifelse(unit == "char", 20, 5),
 
 \item{...}{unused arguments}
 
-\item{token.column}{length-1 character vector : the name of the column containing the occurrences. `token` is the default, according to Text Interchange Formats (see reference).}
+\item{token.column}{length-1 character vector : the name of the column containing the occurrences.
+`token` is the default, according to Text Interchange Formats (see reference).}
 
-\item{id.column}{length-1 character vector : the name column of the column for creating textual unit you don't wan't the kwic to cross. `doc_id` is the default, as it is supposed to exist in all data.frame according to Text Interchange Formats (see reference).}
+\item{id.column}{length-1 character vector : the name column of the column for creating textual unit you don't wan't the kwic to cross.
+`doc_id` is the default, as it is supposed
+to exist in all data.frame according to Text Interchange Formats (see reference).}
 
 \item{interlinearize.with}{character vector : the name of other column with which one can search.}
 }
 \value{
-a KwicLine or KwicWord object (depending on the value of unit)
+a KwicLine or KwicToken object (depending on the value of unit)
 }
 \description{
 Create a kwic from vector, list, data.frame or other structure containing linguistic corpora

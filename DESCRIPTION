@@ -11,7 +11,7 @@ LazyData: true
 Lazyload: yes
 URL: https://github.com/sylvainloiseau/kwic
 RoxygenNote: 6.0.1
-Collate: pkg.R kwic.R KwicLine.R KwicWord.R
+Collate: pkg.R kwic.R KwicLine.R KwicToken.R
 Suggests: knitr,
     rmarkdown,
     testthat

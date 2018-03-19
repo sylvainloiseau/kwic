@@ -12,7 +12,7 @@
 
 <meta name="author" content="Sylvain Loiseau (sylvain.loiseau@univ-paris13.fr)" />
 
-<meta name="date" content="2018-03-08" />
+<meta name="date" content="2018-03-19" />
 
 <title>Kwic: key word in context</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Kwic: key word in context</h1>
 <h4 class="author"><em>Sylvain Loiseau (<a href="mailto:sylvain.loiseau@univ-paris13.fr">sylvain.loiseau@univ-paris13.fr</a>)</em></h4>
-<h4 class="date"><em>2018-03-08</em></h4>
+<h4 class="date"><em>2018-03-19</em></h4>
 
 
 <div id="TOC">
@@ -80,14 +80,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="#printing-kwic">Printing kwic</a></li>
 <li><a href="#tokens-sensitive-kwic">Tokens-sensitive kwic</a></li>
 <li><a href="#case-study">Case study</a><ul>
-<li><a href="#reading-in-a-directory-with-tm">Reading in a directory with tm</a></li>
+<li><a href="#reading-plain-text-files-in-a-directory-with-tm">Reading plain text files in a directory with tm</a></li>
+<li><a href="#reading-tagged-tabulated-files-in-a-directory">Reading tagged (tabulated) files in a directory</a></li>
 </ul></li>
 </ul>
 </div>
 
 <div id="overview" class="section level1">
 <h1>Overview</h1>
-<p>kwic is a R package for producing key word in context (concordance) from linguistic corpora:</p>
+<p>kwic is an R package for producing key word in context (concordance) from linguistic corpora:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(kwic)
 <span class="kw">data</span>(dickensl)
 <span class="kw">kwic</span>(dickensl, <span class="st">&quot;the&quot;</span>)
@@ -99,12 +100,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="co">#&gt;                    2  by the clergyman , the clerk , the undertak</span>
 <span class="co">#&gt;                    2 gyman , the clerk , the undertaker , and the</span>
 <span class="co">#&gt;                    2 he undertaker , and the chief mourner</span></code></pre></div>
-<p>The method work for several representations of corpora :</p>
+<p>The kwic package is intended to fit into the existing R data structures. The method work for several representations of corpora :</p>
 <ul>
 <li>character vector of untokenized strings,</li>
 <li>list of character vectors of tokens,</li>
 <li>data frame with where each row describe a token and columns give the wordform, POS, lemma, etc.,</li>
-<li>VCorpus from the tm package</li>
+<li>VCorpus object (from the tm package).</li>
 </ul>
 <p>The first three corpus types are defined in the Text Interchange Formats : <a href="https://github.com/ropensci/tif" class="uri">https://github.com/ropensci/tif</a></p>
 <p>Several options are available for a fine handling of the output.</p>
@@ -205,12 +206,12 @@ k &lt;-<span class="st"> </span><span class="kw">kwic</span>(dickensl, <span cla
 </div>
 <div id="case-study" class="section level1">
 <h1>Case study</h1>
-<div id="reading-in-a-directory-with-tm" class="section level2">
-<h2>Reading in a directory with tm</h2>
+<div id="reading-plain-text-files-in-a-directory-with-tm" class="section level2">
+<h2>Reading plain text files in a directory with tm</h2>
 <p>Kwic does not address the issue of reading files or walking through directories. The tm package handles this nicely:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mydir &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;text&quot;</span>, <span class="dt">package=</span><span class="st">&quot;kwic&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">d &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;plaintexts&quot;</span>, <span class="dt">package=</span><span class="st">&quot;kwic&quot;</span>)
 corpus &lt;-<span class="st"> </span><span class="kw">VCorpus</span>(
-  <span class="kw">DirSource</span>(<span class="dt">directory=</span>mydir, <span class="dt">encoding=</span><span class="st">&quot;UTF-8&quot;</span>),
+  <span class="kw">DirSource</span>(<span class="dt">directory=</span>d, <span class="dt">encoding=</span><span class="st">&quot;UTF-8&quot;</span>),
   <span class="dt">readerControl =</span> <span class="kw">list</span>(<span class="dt">reader=</span>readPlain)
 )
 <span class="kw">kwic</span>(corpus, <span class="st">&quot;the&quot;</span>)
@@ -222,6 +223,99 @@ corpus &lt;-<span class="st"> </span><span class="kw">VCorpus</span>(
 <span class="co">#&gt;        sentence2.txt d by the clergyman, the clerk, the undertake</span>
 <span class="co">#&gt;        sentence2.txt ergyman, the clerk, the undertaker, and the </span>
 <span class="co">#&gt;        sentence2.txt the undertaker, and the chief mourner.</span></code></pre></div>
+</div>
+<div id="reading-tagged-tabulated-files-in-a-directory" class="section level2">
+<h2>Reading tagged (tabulated) files in a directory</h2>
+<p>Here, several tagged (tabulated) files are in a directory. First, we list the file names:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">d &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="st">&quot;taggedtexts&quot;</span>, <span class="dt">package=</span><span class="st">&quot;kwic&quot;</span>)
+files &lt;-<span class="st"> </span><span class="kw">dir</span>(d, <span class="dt">pattern =</span> <span class="st">&quot;*.txt&quot;</span>)</code></pre></div>
+<p>Below, all files are read as a data frame and stored into a list. They are combined into a large data.frame through rbind. We also add a column with an id for each text.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">corpusl &lt;-<span class="st"> </span><span class="kw">lapply</span>(
+  files,
+  <span class="cf">function</span>(x) <span class="kw">read.table</span>(
+    <span class="kw">paste</span>(d, x, <span class="dt">sep=</span><span class="st">&quot;/&quot;</span>),
+    <span class="dt">quote=</span><span class="st">&quot;&quot;</span>, <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>, <span class="dt">header =</span> <span class="ot">TRUE</span>, <span class="dt">fileEncoding=</span><span class="st">&quot;ISO-8859-1&quot;</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>
+    )
+  )
+
+corpus &lt;-<span class="st"> </span><span class="kw">do.call</span>(<span class="st">&quot;rbind&quot;</span>, corpusl)
+
+corpus<span class="op">$</span>doc_id &lt;-<span class="st"> </span><span class="kw">rep</span>(files, <span class="dt">times=</span><span class="kw">sapply</span>(corpusl, nrow))
+
+<span class="kw">kwic</span>(corpus, <span class="st">&quot;Paris&quot;</span>, <span class="dt">token.column=</span><span class="st">&quot;lemme&quot;</span>, <span class="dt">left=</span><span class="dv">30</span>, <span class="dt">right=</span><span class="dv">30</span>) <span class="co">#, unit=&quot;token&quot;</span>
+<span class="co">#&gt; Number of match: 69</span>
+<span class="co">#&gt; Sorted by: none</span>
+<span class="co">#&gt; Number of lines printed: 69; from: 1; to: 69</span>
+<span class="co">#&gt;                  ref                          left Paris  right                       </span>
+<span class="co">#&gt;        1-fortune.txt hef , ce homme aller jusque à Paris , enfoncer le porte de le vill</span>
+<span class="co">#&gt;        1-fortune.txt  . elle le rêver tout trois à Paris , dans de haut position que el</span>
+<span class="co">#&gt;        1-fortune.txt ari à le envoyer tout trois à Paris . deux faire leur droit , le t</span>
+<span class="co">#&gt;        1-fortune.txt nze an , le oeil tourner vers Paris , guetter le occasion . dès so</span>
+<span class="co">#&gt;        1-fortune.txt  brusquement , il partir pour Paris . il ne avoir pas cinq cent fr</span>
+<span class="co">#&gt;        1-fortune.txt dulgence à le épreuve . avoir Paris , il mener un vie sale et oisi</span>
+<span class="co">#&gt;        1-fortune.txt lorsque son frère partir pour Paris , il avoir un instant le idée </span>
+<span class="co">#&gt;        1-fortune.txt famille . après avoir faire à Paris de excellent étude médical , i</span>
+<span class="co">#&gt;        1-fortune.txt  le académie de le science de Paris . Plassans ignorer absolument </span>
+<span class="co">#&gt;        1-fortune.txt xer à Marseille et le autre à Paris . en liquider , il avoir bien </span>
+<span class="co">#&gt;        1-fortune.txt événement . Eugène surveiller Paris ; Aristide rêver de égorger Pl</span>
+<span class="co">#&gt;        1-fortune.txt assans , quand on se battre à Paris . mais le surface avoir beau p</span>
+<span class="co">#&gt;        1-fortune.txt ont on se moquer volontiers à Paris , être plein de traîtrise , de</span>
+<span class="co">#&gt;        1-fortune.txt i avoir gagner de le argent à Paris et qui daigner venir le manger</span>
+<span class="co">#&gt;        1-fortune.txt  , Eugène quitter brusquement Paris et venir passer quinze jour au</span>
+<span class="co">#&gt;        1-fortune.txt e devenir , ce que il faire à Paris . avoir son arrivée , on le tr</span>
+<span class="co">#&gt;        1-fortune.txt  deux jour avant son retour à Paris , Eugène rencontrer , sur le c</span>
+<span class="co">#&gt;        1-fortune.txt ar son deux année de séjour à Paris , voir plus loin que le cervea</span>
+<span class="co">#&gt;        1-fortune.txt tionnement par un banquier de Paris ... tu comprendre , je avoir c</span>
+<span class="co">#&gt;        1-fortune.txt ue son fils aîné fréquenter à Paris ; elle même ignorer ce que il </span>
+<span class="co">#&gt;        1-fortune.txt tre Bonaparte à Londres que à Paris . notre affaire marcher plus v</span>
+<span class="co">#&gt;        1-fortune.txt rétrograde qui se accomplir à Paris . le ensemble de mesure antili</span>
+<span class="co">#&gt;        1-fortune.txt nettement sur son situation à Paris , il être évident que il trava</span>
+<span class="co">#&gt;        1-fortune.txt lus contradictoire arriver de Paris ; tantôt le républicain le emp</span>
+<span class="co">#&gt;        1-fortune.txt le annonce de le événement de Paris . il y avoir avoir un rassembl</span>
+<span class="co">#&gt;        2-curée.txt garder ce monde qui rentrer à Paris , ce monde qui être à ton geno</span>
+<span class="co">#&gt;        2-curée.txt r , se diriger doucement vers Paris . et , tout en haut , à le bou</span>
+<span class="co">#&gt;        2-curée.txt tenant . le transformation de Paris , continuer m. Toutin-Laroche </span>
+<span class="co">#&gt;        2-curée.txt e le opposition : bouleverser Paris , ce être le fertiliser . Sacc</span>
+<span class="co">#&gt;        2-curée.txt ire un phrase : le travail de Paris , dire il , avoir faire vivre </span>
+<span class="co">#&gt;        2-curée.txt ristide Rougon se abattre sur Paris , à le lendemain de le 2 Décem</span>
+<span class="co">#&gt;        2-curée.txt udire le province , parler de Paris avec de le appétit de loup , j</span>
+<span class="co">#&gt;        2-curée.txt uver le âpre besoin de courir Paris , de battre de son gros soulie</span>
+<span class="co">#&gt;        2-curée.txt  de fripon impuni . le air de Paris le griser , il croire entendre</span>
+<span class="co">#&gt;        2-curée.txt ce . il ne être pas revenir à Paris depuis le heureux année que il</span>
+<span class="co">#&gt;        2-curée.txt ièvre . Aristide , en vener à Paris , avoir surtout compter sur Eu</span>
+<span class="co">#&gt;        2-curée.txt par le activité boutiquier de Paris , il rentrer , irriter de le b</span>
+<span class="co">#&gt;        2-curée.txt r sous lui le labeur géant de Paris , il lui prendre un envie fou </span>
+<span class="co">#&gt;        2-curée.txt ixer le durée . être pauvre à Paris , ce être être pauvre deux foi</span>
+<span class="co">#&gt;        2-curée.txt  on voir rôder sur le pavé de Paris , promener son plan de fortune</span>
+<span class="co">#&gt;        2-curée.txt  blanchisseuse . à ce heure , Paris offrir , pour un homme comme A</span>
+<span class="co">#&gt;        2-curée.txt expression de Eugène Rougon , Paris se mettre à tabl et rêver gaud</span>
+<span class="co">#&gt;        2-curée.txt ée . le Empire aller faire de Paris le mauvais lieu de le Europe .</span>
+<span class="co">#&gt;        3- ventre.txt                  le Ventre De Paris i à le milieu de le grand sile</span>
+<span class="co">#&gt;        3- ventre.txt ture de maraîcher monter vers Paris , avec le cahot rhythmés de le</span>
+<span class="co">#&gt;        3- ventre.txt e regard inquiet : je aller à Paris , je être tomber , je ne savoi</span>
+<span class="co">#&gt;        3- ventre.txt ire . et où aller vous , dans Paris ? demander t elle de nouveau .</span>
+<span class="co">#&gt;        3- ventre.txt r conscience , par ce imag de Paris , à le loin , très loin , derr</span>
+<span class="co">#&gt;        3- ventre.txt ui falloir monter , atteindre Paris , tout en haut . le avenue lui</span>
+<span class="co">#&gt;        3- ventre.txt  . puis , Florent entrer dans Paris , évanoui , le dent serré , su</span>
+<span class="co">#&gt;        3- ventre.txt temps que vous être absent de Paris , vous ne connaître peut-être </span>
+<span class="co">#&gt;        3- ventre.txt çat qui ne en finir plus . de Paris à le havre , le prisonnier ne </span>
+<span class="co">#&gt;        3- ventre.txt ler à le os . et il retrouver Paris , gras , superbe , déborder de</span>
+<span class="co">#&gt;        3- ventre.txt  pas rester dans ce diable de Paris , tout le journée , sur un tro</span>
+<span class="co">#&gt;        3- ventre.txt  : vous avoir de le famille à Paris , ne être ce pas ? demander t </span>
+<span class="co">#&gt;        3- ventre.txt i , je avoir avoir un neveu à Paris . il avoir mal tourner , il se</span>
+<span class="co">#&gt;        3- ventre.txt and madame François parler de Paris , elle être plein de ironie et</span>
+<span class="co">#&gt;        3- ventre.txt ître plus dans votre gueux de Paris . vous pouvoir peut-être lui d</span>
+<span class="co">#&gt;        3- ventre.txt ivateur , venir un environ de Paris , étaler sur de le panier leur</span>
+<span class="co">#&gt;        3- ventre.txt ui monter à le beau milieu de Paris , chaque matin . il rôder sur </span>
+<span class="co">#&gt;        3- ventre.txt enir de commencer son droit à Paris , lorsque son mère mourir . el</span>
+<span class="co">#&gt;        3- ventre.txt e nécessaire pour retourner à Paris . à aucun prix , il ne vouloir</span>
+<span class="co">#&gt;        3- ventre.txt le emmener , le soir même . à Paris , il ne pouvoir plus être ques</span>
+<span class="co">#&gt;        3- ventre.txt esse . il avoir un parent , à Paris , un frère de leur mère , un G</span>
+<span class="co">#&gt;        3- ventre.txt urnée de février ensanglanter Paris , il être navrer , il courir l</span>
+<span class="co">#&gt;        3- ventre.txt e maison de le quatre coin de Paris . Quenu se laisser entraîner à</span>
+<span class="co">#&gt;        3- ventre.txt avoir laisser que un cousin à Paris , dont on lui avoir écrire le </span>
+<span class="co">#&gt;        3- ventre.txt  . il ne être d'abord venir à Paris que pour se perfectionner et r</span>
+<span class="co">#&gt;        3- ventre.txt re , il rêver de se établir à Paris avec le héritage de son mère q</span></code></pre></div>
 </div>
 </div>
 

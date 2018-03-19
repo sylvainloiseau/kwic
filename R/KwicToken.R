@@ -12,9 +12,9 @@
 #' @export
 #'
 #' @examples
-#' data(dickensl, unit="token")
-#' kwic(dickensl, "the")
-setClass("KwicWord",
+#' data(dickensl)
+#' kwic(dickensl, "the", unit="tokens")
+setClass("KwicToken",
          slot=c(
            ref="character",
            concordances.matrix="matrix",
@@ -26,9 +26,9 @@ setClass("KwicWord",
            keyword.match.length="numeric"
          ));
 
-#' Print a summary of a KwicWord object
+#' Print a summary of a KwicToken object
 #'
-#' @param object KwicWord.
+#' @param object KwicToken.
 #'
 #' @export
 #'
@@ -36,13 +36,13 @@ setClass("KwicWord",
 #' data(dickensl, unit="token")
 #' res <- kwic(dickensl, "the")
 #' summary(res)
-setMethod("summary", signature(object = "KwicWord"), function(object) {
+setMethod("summary", signature(object = "KwicToken"), function(object) {
   cat(paste(object@nbr.match, "lines of concordance for keyword: '", object@keyword, "'"));
 });
 
-#' Show a KwicWord object
+#' Show a KwicToken object
 #'
-#' @param object KwicWord.
+#' @param object KwicToken.
 #'
 #' @export
 #'
@@ -50,13 +50,13 @@ setMethod("summary", signature(object = "KwicWord"), function(object) {
 #' data(dickensl, unit="token")
 #' res <- kwic(dickensl, "the")
 #' show(res)
-setMethod("show", signature(object="KwicWord"), function(object) {
+setMethod("show", signature(object="KwicToken"), function(object) {
   print(object);
 });
 
-#' Print a KwicWord object
+#' Print a KwicToken object
 #'
-#' @param x KwicWord object: the set of kwic lines
+#' @param x KwicToken object: the set of kwic lines
 #' @param from length-1 numeric vector: index of the first line to be printed
 #' @param to length-1 numeric vector: index of the last line to be printed
 #' @param sort.by length-1 character or numeric vector: sorting lines. 'none': corpus order; 'right' and 'left': first word after or before the keyword; 'random': randomized order; 0: keyword, n < 0 : the n^{th} word before the keyword; n > 0 : the n^{th} word after the keyword
@@ -70,7 +70,7 @@ setMethod("show", signature(object="KwicWord"), function(object) {
 #' data(dickensl, unit="token")
 #' res <- kwic(dickensl, "the")
 #' print(res)
-setMethod("print", signature(x="KwicWord"), function(x, from=1, to=-1, sort.by="none", decreasing=FALSE, file="", append=FALSE, ...) {
+setMethod("print", signature(x="KwicToken"), function(x, from=1, to=-1, sort.by="none", decreasing=FALSE, file="", append=FALSE, ...) {
 
   if (to<1) to <- x@nbr.match;
   if (to > x@nbr.match) stop(paste("'to' cannot be greater than the number of matches (", x@nbr.match, ")", sep=""));

@@ -32,6 +32,6 @@ A class representing an extraction of kwic as raw character sequences from a cor
 }}
 
 \examples{
-data(dickensl, unit="line")
-kwic(dickensl, "the")
+data(dickensl)
+kwic(dickensl, "the", unit="char")
 }

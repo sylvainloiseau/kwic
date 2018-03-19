@@ -41,10 +41,29 @@ print(k, sort.by=-2)
 print(k, sort.by=2)
 
 ## ------------------------------------------------------------------------
-mydir <- system.file("text", package="kwic")
+d <- system.file("plaintexts", package="kwic")
 corpus <- VCorpus(
-  DirSource(directory=mydir, encoding="UTF-8"),
+  DirSource(directory=d, encoding="UTF-8"),
   readerControl = list(reader=readPlain)
 )
 kwic(corpus, "the")
+
+## ------------------------------------------------------------------------
+d <- system.file("taggedtexts", package="kwic")
+files <- dir(d, pattern = "*.txt")
+
+## ------------------------------------------------------------------------
+corpusl <- lapply(
+  files,
+  function(x) read.table(
+    paste(d, x, sep="/"),
+    quote="", sep="\t", header = TRUE, fileEncoding="ISO-8859-1", stringsAsFactors = FALSE
+    )
+  )
+
+corpus <- do.call("rbind", corpusl)
+
+corpus$doc_id <- rep(files, times=sapply(corpusl, nrow))
+
+kwic(corpus, "Paris", token.column="lemme", left=30, right=30) #, unit="token"
 

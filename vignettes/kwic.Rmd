@@ -6,7 +6,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{kwic}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 # Overview
 
-kwic is a R package for producing key word in context (concordance) from linguistic corpora:
+kwic is an R package for producing key word in context (concordance) from linguistic corpora:
 
 ```{r}
 library(kwic)
@@ -28,12 +28,12 @@ data(dickensl)
 kwic(dickensl, "the")
 ```
 
-The method work for several representations of corpora :
+The kwic package is intended to fit into the existing R data structures. The method work for several representations of corpora :
 
 - character vector of untokenized strings, 
 - list of character vectors of tokens,
 - data frame with where each row describe a token and columns give the wordform, POS, lemma, etc.,
-- VCorpus from the tm package
+- VCorpus object (from the tm package).
 
 The first three corpus types are defined in the Text Interchange Formats : https://github.com/ropensci/tif
 
@@ -103,17 +103,43 @@ print(k, sort.by=2)
 
 # Case study
 
-## Reading in a directory with tm
+## Reading plain text files in a directory with tm
 
 Kwic does not address the issue of reading files or walking through directories. The tm package handles this nicely:
 
 ```{r}
-mydir <- system.file("text", package="kwic")
+d <- system.file("plaintexts", package="kwic")
 corpus <- VCorpus(
-  DirSource(directory=mydir, encoding="UTF-8"),
+  DirSource(directory=d, encoding="UTF-8"),
   readerControl = list(reader=readPlain)
 )
 kwic(corpus, "the")
 ```
 
+## Reading tagged (tabulated) files in a directory
+
+Here, several tagged (tabulated) files are in a directory. First, we list the file names:
+
+```{r}
+d <- system.file("taggedtexts", package="kwic")
+files <- dir(d, pattern = "*.txt")
+```
+
+Below, all files are read as a data frame and stored into a list. They are combined into a large data.frame through rbind. We also add a column with an id for each text.
+
+```{r}
+corpusl <- lapply(
+  files,
+  function(x) read.table(
+    paste(d, x, sep="/"),
+    quote="", sep="\t", header = TRUE, fileEncoding="ISO-8859-1", stringsAsFactors = FALSE
+    )
+  )
+
+corpus <- do.call("rbind", corpusl)
+
+corpus$doc_id <- rep(files, times=sapply(corpusl, nrow))
+
+kwic(corpus, "Paris", token.column="lemme", left=30, right=30) #, unit="token"
+```
 

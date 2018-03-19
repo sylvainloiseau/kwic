@@ -9,7 +9,7 @@
 #' @param ... unused arguments
 #' @param ref character vectors: the name for the different parts of the corpus
 #'
-#' @return a KwicLine or KwicWord object (depending on the value of unit)
+#' @return a KwicLine or KwicToken object (depending on the value of unit)
 #'
 #' @references Text Interchange Formats : https://github.com/ropensci/tif
 #'
@@ -155,8 +155,11 @@ setMethod("kwic", "VCorpus", function(corpus,
   }
 })
 
-#' @param token.column length-1 character vector : the name of the column containing the occurrences. `token` is the default, according to Text Interchange Formats (see reference).
-#' @param id.column length-1 character vector : the name column of the column for creating textual unit you don't wan't the kwic to cross. `doc_id` is the default, as it is supposed to exist in all data.frame according to Text Interchange Formats (see reference).
+#' @param token.column length-1 character vector : the name of the column containing the occurrences.
+#' `token` is the default, according to Text Interchange Formats (see reference).
+#' @param id.column length-1 character vector : the name column of the column for creating textual unit you don't wan't the kwic to cross.
+#' `doc_id` is the default, as it is supposed
+#' to exist in all data.frame according to Text Interchange Formats (see reference).
 #' @param interlinearize.with character vector : the name of other column with which one can search.
 #'
 #' @rdname kwic
@@ -177,18 +180,18 @@ setMethod("kwic", "data.frame", function(corpus,
                                          id.column = "doc_id",
                                          interlinearize.with = NULL) {
   if (!token.column %in% colnames(corpus))
-    stop(paste("Unknown token column:", token.column))
+    stop(paste0("Column not found: '", token.column, "' (argument 'token.column')."))
 
   if (!id.column %in% colnames(corpus))
-    stop(paste("Unknown id column:", id.column))
-
-  token.column <- corpus[[token.column]]
+    stop(paste0("Column not found: '", id.column, "' (argument 'id.column')."))
 
   if (is.null(ref)) {
     ref <- corpus[[id.column]]
   }
 
+  token.column <- corpus[[token.column]]
   ids <- corpus[[id.column]]
+
   tokensl <- split(token.column, ids)
 
   if (!is.null(interlinearize.with))
@@ -199,7 +202,7 @@ setMethod("kwic", "data.frame", function(corpus,
        left,
        right,
        unit = unit,
-       ref = ref)
+       ref = names(tokensl))
 })
 
 #' Private function. Create a KwicLine object.
@@ -278,7 +281,7 @@ setMethod("kwic", "data.frame", function(corpus,
   )
 }
 
-#' Private function. Create a KwicWord object.
+#' Private function. Create a KwicToken object.
 #'
 #' @param corpus a list of character vector : a tokenized corpus.
 #' @param pattern length-1 character vector or either regexpr or fixed string
@@ -286,7 +289,7 @@ setMethod("kwic", "data.frame", function(corpus,
 #' @param right length-1 integer vector : number of chars on the left size
 #' @param fixed length-1 logical vector : is the pattern argument to be interpreted as a regexpr or as fixed string
 #'
-#' @return a KwicWord object
+#' @return a KwicToken object
 .kwic_word <-
   function(corpus,
            pattern,
@@ -385,7 +388,7 @@ setMethod("kwic", "data.frame", function(corpus,
 
     return(
       new(
-        "KwicWord",
+        "KwicToken",
         ref = rep(ref, nbr.match.by.parts),
         concordances.matrix = res,
         keyword = pattern,

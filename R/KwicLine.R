@@ -14,8 +14,8 @@
 #' @export
 #'
 #' @examples
-#' data(dickensl, unit="line")
-#' kwic(dickensl, "the")
+#' data(dickensl)
+#' kwic(dickensl, "the", unit="char")
 setClass(
   "KwicLine",
   slot = c(
@@ -81,6 +81,9 @@ setMethod("show", signature(object="KwicLine"), function(object) {
 #' res <- kwic(dickensl, "the")
 #' print(res)
 setMethod("print", signature(x="KwicLine"), function(x, from=1, to=-1, sort.by="none", decreasing=FALSE, file="", append=FALSE, ...) {
+  stopifnot(length(from) == 1 & is.numeric(from));
+  stopifnot(length(to) == 1 & is.numeric(to));
+
   if (to < 1) to <- x@nbr.match;
   if (to > x @nbr.match) stop(paste("'to' cannot be greater than the number of matches (", x@nbr.match, ")", sep=""));
   if (from < 1) stop("'from' cannot be less than 1");
@@ -89,7 +92,8 @@ setMethod("print", signature(x="KwicLine"), function(x, from=1, to=-1, sort.by="
 
   ## Ordering of the lines
   stopifnot(!is.null(sort.by));
-  stopifnot(length(sort.by) == 1);
+  stopifnot(length(sort.by) == 1 & is.character(sort.by));
+  stopifnot(length(decreasing) == 1 & is.logical(decreasing));
   if (sort.by == "right") {
     o <- order(x@right.context.slot, decreasing=decreasing)
   } else if (sort.by == "none") {

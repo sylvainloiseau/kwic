@@ -1,7 +1,7 @@
 #' Print Textual Corpora as Key Word in Context (aka concordance)
 #'
 #' @exportClass KwicLine
-#' @exportClass KwicWord
+#' @exportClass KwicToken
 #' @importFrom methods new
 #' @importFrom methods setOldClass
 #' @aliases kwic-package
